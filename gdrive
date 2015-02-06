@@ -1,0 +1,168 @@
+#!./bin/python
+
+import argparse
+import os
+import ntpath
+import json
+
+from google.gapi import *
+
+config = {}
+
+if (os.path.exists('config.json')):
+    json_data = open('config.json')
+    config = json.load(json_data)
+    json_data.close()
+else:
+    print 'Initializing app:'
+    root_name = raw_input('Enter root folder name: ')
+    root_id = create_folder_in_drive(get_service(), root_name, '')
+
+    config['root'] = {
+            'name' : root_name,
+            'id' : root_id
+            }
+    with open('config.json', 'w') as outfile:
+            json.dump(config, outfile)
+
+""" Obtains the file name from the path
+
+    Args:
+        path : string path to the file
+
+    Returns:
+        the name of the file in question
+"""
+def obtain_filename(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)
+
+
+""" Obtains the parent directory of a file
+
+    Args:
+        path : string path to the file
+
+    Returns:
+        the path to the parent directory
+"""
+def obtain_parent(path):
+    return os.path.abspath(os.path.join(path, os.pardir))
+
+
+""" Initializes an instance of the application
+    This function will create a config json file
+"""
+def init_app():
+    root_name = raw_input('Enter root directory name: ')
+
+    drive_service = get_service()
+    root_id = create_folder_in_drive(drive_service, root_name, '')
+
+    config['root'] = {
+            'name' : root_name,
+            'id' : root_id
+        }
+
+    # Writes the new file
+    with open('config.json', 'w') as outfile:
+            json.dump(config, outfile)
+
+
+""" Uploads the file to the app
+
+    Args:
+        path : local path of the file
+
+    Returns:
+        File metadata or None if operation fails
+"""
+def upload_file(path):
+    filename = obtain_filename(path)
+    parent_name = obtain_parent(path)
+
+    if (is_file_in_db(path)):
+        return None
+
+    parent_id = get_folder_id(parent_name) or config['root']['id']
+
+    return add_file(path, filename, parent_id)
+
+### TODO remove_file
+
+""" Recursively uploads files to drive
+
+    Args:
+        path : local path of the file
+
+    Returns:
+        None
+"""
+def recursive_upload(path):
+    for root, dir, files in os.walk(path):
+        parent_path = obtain_parent(root)
+        parent_id = get_folder_id(parent_path) or config['root']['id']
+
+        folder_id = get_folder_id(root)
+
+        if (folder_id is None):
+            folder_id = add_folder(root, obtain_filename(root), parent_id)
+
+        for f in files:
+            file_path = root + "/" + f
+            if (is_file_in_db(file_path) is False):
+                upload_file(file_path)
+
+### TODO recursive_remove
+
+""" Updates all the files in the database
+"""
+def update_all():
+    file_list = get_all_files()
+    drive_service = get_service()
+
+    if (file_list):
+        for file in file_list:
+            push_file_to_drive(drive_service, file['path'], file['name'])
+    else:
+        return None
+
+
+""" Updates the file in the app
+
+    Args:
+        path : path to the file locally
+
+    Returns:
+        metadata of the file after update or None if operation failed
+"""
+def update(path):
+    file = get_file(path)
+
+    if (file is None):
+        print 'An error occurred: file not in app'
+        return None
+
+    return push_file_to_drive(get_service(), file['path'], file['name'])
+
+
+parser = argparse.ArgumentParser(
+            prog = 'GDrive',
+            description = 'Commandline interface for Google Drive'
+        )
+
+parser.add_argument('-a', '--add', action="store")
+parser.add_argument('-u', '--update', action='store_true')
+
+args = parser.parse_args()
+
+if (args.add):
+    abs_path = os.path.abspath(args.add)
+
+    if (os.path.isfile(abs_path)):
+        upload_file(abs_path)
+    else:
+        recursive_upload(abs_path)
+
+if (args.update):
+    update_all()
