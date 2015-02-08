@@ -328,21 +328,3 @@ def retrieve_all_file():
             print 'An error occurred %s' % error
             break
     print res
-
-# retrieve_all_file()
-#title = raw_input('title:')
-#description = raw_input('description: ')
-#mimetype = raw_input('mimetype: ')
-#path = raw_input('path: ')
-
-# test add
-# print add_file('/home/steven/cdrive/drive2/document.txt','test','')
-
-# test add_folder
-# create_folder(get_service(), 'test','')
-
-# test remove
-# print delete_file('/home/steven/cdrive/drive2/document.txt')
-
-# test update file
-# print push_file_to_drive(get_service(), '/home/steven/cdrive/drive2/document.txt', 'new')

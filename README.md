@@ -1,21 +1,20 @@
-PyDrive
+gDrive
 ===
 A terminal interface for Google Drive written in python
 
 Note that this is still under development, I have only coded enough to satisfy
-my needs which is backing up the comtents of my computer onto good Drive.
+my needs which is backing up the contents of my computer onto Google Drive.
 
-Dependencies
+Usage
 ===
-python2.7
 
-pymongo
+Adding a file to Drive or recursively adding a folder:
 
-	pip install pymongo
+	gdrive -a <PATH>
 
-google-api-client
+Updating your content:
 
-	pip install --update google-api-python-client
+	gdrive -u
 
 Bugs
 ===
