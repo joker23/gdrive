@@ -16,3 +16,8 @@ pymongo
 google-api-client
 
 	pip install --update google-api-python-client
+
+Bugs
+===
+- Auto mimetypes?
+- add ignore?

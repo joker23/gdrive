@@ -1,4 +1,4 @@
-#!./bin/python
+#!/home/steven/gdrive/bin/python
 
 import argparse
 import os
@@ -9,8 +9,8 @@ from google.gapi import *
 
 config = {}
 
-if (os.path.exists('config.json')):
-    json_data = open('config.json')
+if (os.path.exists('/home/steven/gdrive/config.json')):
+    json_data = open('/home/steven/gdrive/config.json')
     config = json.load(json_data)
     json_data.close()
 else:
@@ -22,7 +22,7 @@ else:
             'name' : root_name,
             'id' : root_id
             }
-    with open('config.json', 'w') as outfile:
+    with open('/home/steven/gdrive/config.json', 'w') as outfile:
             json.dump(config, outfile)
 
 """ Obtains the file name from the path
@@ -111,6 +111,7 @@ def recursive_upload(path):
         for f in files:
             file_path = root + "/" + f
             if (is_file_in_db(file_path) is False):
+                print 'uploading ' + f + '...'
                 upload_file(file_path)
 
 ### TODO recursive_remove
