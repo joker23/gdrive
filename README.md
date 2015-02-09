@@ -16,7 +16,7 @@ Updating your content:
 
 	gdrive -u
 
-Bugs
+Bugs/TODOs
 ===
 - Auto mimetypes?
 - add ignore?

@@ -153,7 +153,8 @@ parser = argparse.ArgumentParser(
         )
 
 parser.add_argument('-a', '--add', action="store")
-parser.add_argument('-u', '--update', action='store_true')
+parser.add_argument('-u', '--update', action='store')
+parser.add_argument('-ua', '--updateall', action='store_true')
 
 args = parser.parse_args()
 
@@ -166,4 +167,13 @@ if (args.add):
         recursive_upload(abs_path)
 
 if (args.update):
+    abs_path = os.path.abspath(args.update)
+
+    if (get_file(abs_path)):
+        update(path)
+    else:
+        print 'An error occurred: fil not in app'
+
+if (args.updateall):
     update_all()
+#TODO recursive update

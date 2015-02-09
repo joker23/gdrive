@@ -230,6 +230,8 @@ def get_all_files():
 def push_file_to_drive(service, path, title):
     file_id = get_file_id(path)
 
+    print 'updating ' + path + '...'
+
     if (not file_id):
         print 'An error has occurred the file does not exist in the app'
         return None
@@ -242,7 +244,7 @@ def push_file_to_drive(service, path, title):
         file['title'] = title
 
         # File's new content.
-        media_body = MediaFileUpload(path, resumable=True)
+        media_body = MediaFileUpload(path, mimetype='text/plain', resumable=True)
 
         # Send the request to the API.
         updated_file = service.files().update(
