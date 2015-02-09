@@ -18,5 +18,6 @@ Updating your content:
 
 Bugs/TODOs
 ===
-- Auto mimetypes?
-- add ignore?
+- [TODO] Auto mimetypes?
+- [TODO] add ignore?
+- [BUG] what if we are updating a directory?

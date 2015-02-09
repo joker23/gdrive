@@ -8,9 +8,10 @@ import json
 from google.gapi import *
 
 config = {}
+path_to_config = os.path.dirname(__file__) + '/config.json'
 
-if (os.path.exists('/home/steven/gdrive/config.json')):
-    json_data = open('/home/steven/gdrive/config.json')
+if (os.path.exists(path_to_config)):
+    json_data = open(path_to_config)
     config = json.load(json_data)
     json_data.close()
 else:
@@ -22,7 +23,7 @@ else:
             'name' : root_name,
             'id' : root_id
             }
-    with open('/home/steven/gdrive/config.json', 'w') as outfile:
+    with open(path_to_config, 'w') as outfile:
             json.dump(config, outfile)
 
 """ Obtains the file name from the path
@@ -65,7 +66,7 @@ def init_app():
         }
 
     # Writes the new file
-    with open('config.json', 'w') as outfile:
+    with open(path_to_config, 'w') as outfile:
             json.dump(config, outfile)
 
 
@@ -170,7 +171,7 @@ if (args.update):
     abs_path = os.path.abspath(args.update)
 
     if (get_file(abs_path)):
-        update(path)
+        update(abs_path)
     else:
         print 'An error occurred: fil not in app'
 
