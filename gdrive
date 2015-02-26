@@ -114,6 +114,9 @@ def recursive_upload(path):
             if (is_file_in_db(file_path) is False):
                 print 'uploading ' + f + '...'
                 upload_file(file_path)
+            else:
+                print f + ' already exists... updating'
+                update(file_path)
 
 ### TODO recursive_remove
 
