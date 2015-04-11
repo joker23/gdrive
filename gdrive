@@ -128,7 +128,13 @@ def update_all():
 
     if (file_list):
         for file in file_list:
-            push_file_to_drive(drive_service, file['path'], file['name'])
+            if os.path.exists(file['path']):
+                push_file_to_drive(drive_service, file['path'], file['name'])
+            else:
+                print file['name'] + ' no longer exists in local directory'
+                print 'deleting from database and drive...'
+                delete_file_from_drive(drive_service, file['drive_id'])
+
     else:
         return None
 

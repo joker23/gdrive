@@ -5,6 +5,7 @@ from apiclient import errors
 from auth import get_service
 from auth import get_auth_code
 from apiclient.http import MediaFileUpload
+from drive_util import *
 from pymongo import MongoClient
 
 ### Api access for drive
@@ -18,16 +19,15 @@ from pymongo import MongoClient
 dbclient = MongoClient('localhost', 27017)
 db = dbclient.drive
 
-""" Adds a file to the app
 
-    Args:
-        path : path to the file
-        filename : name of the file
-        parent_id : the id of the parent folder
-
-    Returns:
-        File metadata if successful, None otherwise
-"""
+### add_file
+#Adds a file to the app
+#   @args:
+#       path : path to the file
+#       filename : name of the file
+#       parent_id : the id of the parent folder
+#   @returns:
+#       File metadata if successful, None otherwise
 def add_file(path, filename, parent_id):
 
     # first check for valid parameters
@@ -53,19 +53,21 @@ def add_file(path, filename, parent_id):
         return file_id
 
 
-""" Creates a file in drive
-
-    Args:
-        service : Drive API service instance
-        path : Path to the file being uploaded
-        filename : The name of the file to insert
-        parent_id : Parent folder's id
-
-    Returns:
-        File metadata if successful, None otherwise
-"""
+### create_file_in_drive
+# Creates a file in drive
+#    @args:
+#       service : Drive API service instance
+#       path : Path to the file being uploaded
+#       filename : The name of the file to insert
+#       parent_id : Parent folder's id
+#    @returns:
+#       File metadata if successful, None otherwise
 def create_file_in_drive(service, path, filename, parent_id):
-    media_body = MediaFileUpload(path, mimetype='text/plain', resumable=True)
+    if (has_mimetype(path)):
+        media_body = MediaFileUpload(path, resumable=True)
+    else:
+        media_body = MediaFileUpload(path, mimetype='application/unknown',
+                resumable=True)
 
     body = {
         'title' : filename
@@ -257,28 +259,6 @@ def push_file_to_drive(service, path, title):
         return None
 
 
-""" Deletes a file from the app
-
-    Args:
-        path : path to the file
-
-    Returns:
-        True if the operation was successful, False otherwise
-"""
-def delete_file(path):
-    file_id = get_file_id(path)
-
-    if (not file_id):
-        print 'An error has occurred the file does not exist in the app'
-        return None
-
-    if (delete_file_from_drive(get_service(), file_id)):
-        if (db.file.remove({'drive_id' : file_id})):
-            os.remove(path)
-            return True
-    return False
-
-
 """ Deletes a file from google drive
 
     Args:
@@ -291,6 +271,7 @@ def delete_file(path):
 def delete_file_from_drive(service, file_id):
     try:
         if (not service.files().delete(fileId=file_id).execute()):
+            db.file.remove({'drive_id' : file_id})
             return True
         else:
             return False
